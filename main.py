@@ -7,6 +7,7 @@ from pydantic import Field
 from typing import Optional
 
 import mcp.types as types
+
 from weaviate_utils import connect_to_weaviate, get_articles
 
 templates = """Truth. It’s more important now than ever.
@@ -56,12 +57,9 @@ def get_articles_with_config(
 
         main_cats = set(cat for sublist in cats for cat in sublist)
 
-        system_instructions = f"Newspaper: {media_names}\n\n"
-        system_instructions += f"Categories:\n{main_cats}\n\n"
-        system_instructions += f"Instructions:\n{templates}\n\n"
-
-        # Format response
         response = f"Newspaper: {media_names}\n\n"
+        response += f"Categories:\n{main_cats}\n\n"
+        response += f"Instructions:\n{templates}\n\n"
         response += "=" * 50 + "\n"
         response += f"ARTICLES (Query: '{query}', Limit: {5})\n"
         response += "=" * 50 + "\n\n"
@@ -72,6 +70,7 @@ def get_articles_with_config(
             for i, article in enumerate(articles, 1):
                 response += f"Article {i}:\n"
                 response += f"Title: {article.properties.get('title', 'N/A')}\n"
+                response += f"Media Name: {article.properties.get("media_name","N/A")}"
                 response += f"Content: {article.properties.get('content', 'N/A')}\n"
                 response += f"URL: {article.properties.get('url', 'N/A')}\n"
                 response += (
@@ -84,9 +83,8 @@ def get_articles_with_config(
                 response += "\n" + "-" * 40 + "\n\n"
 
         client.close()
-        res = {"system": system_instructions, "articles": response}
 
-        return res
+        return response
 
     except Exception as e:
         return f"Error retrieving articles: {str(e)}"
