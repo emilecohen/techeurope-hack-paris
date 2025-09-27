@@ -1,0 +1,29 @@
+[project]
+name = "rss-news-processor"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "httpx",
+    "supabase",
+    "pydantic",
+    "python-dotenv",
+    "python-multipart",
+    "psycopg2>=2.9.10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
