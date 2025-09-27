@@ -1,1 +1,1 @@
-# Experimental Weaviate
+# Experimental MCP

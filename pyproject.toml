@@ -1,29 +1,10 @@
 [project]
-name = "rss-news-processor"
+name = "mcp-server"
 version = "0.1.0"
-requires-python = ">=3.12"
-
+description = "Python MCP Server"
+readme = "README.md"
+requires-python = ">=3.13"
 dependencies = [
-    "fastapi",
-    "uvicorn[standard]",
-    "httpx",
-    "supabase",
-    "pydantic",
-    "python-dotenv",
-    "python-multipart",
-    "psycopg2>=2.9.10",
+    "black>=25.1.0",
+    "mcp",
 ]
-
-[project.optional-dependencies]
-dev = [
-    "pytest",
-    "pytest-asyncio",
-    "black",
-    "isort",
-    "flake8",
-    "mypy",
-]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
