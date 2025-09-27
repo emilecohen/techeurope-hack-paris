@@ -1,0 +1,1 @@
+pip install livekit-agents[mcp]~=1.2
