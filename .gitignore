@@ -1,0 +1,4 @@
+# Ignore .env files in any folder
+**/.env
+**/.env.local
+**/.DS_Store
