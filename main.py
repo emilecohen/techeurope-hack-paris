@@ -7,29 +7,30 @@ from pydantic import Field
 from typing import Optional
 
 import mcp.types as types
-from agent_config_utils import get_agent_instructions, get_default_agent_config
-from constants import AGENT_CONFIG_ID
 from weaviate_utils import connect_to_weaviate, get_articles
 
+templates = """Truth. It’s more important now than ever.
+Established 1851.
+
+IDENTITY:
+We are a global leader in independent journalism, dedicated to seeking the truth and helping people understand the world. Our role is to inform, inspire, and empower our community through rigorous reporting, in-depth analysis, and a steadfast commitment to integrity.
+
+VOICE:
+Speak in a clear, authoritative, and thoughtful manner. We address readers with respect, clarity, and a sense of shared purpose. Always use "we" for the newspaper and "our" for the community.
+
+STYLE EXAMPLES:
+- "Our mission is to seek the truth and help people understand the world."
+- "Breaking news that doesn’t sacrifice quality for speed."
+- "Expert beat reporting that allows readers to stay abreast of important subjects and storylines."
+
+CONTENT FOCUS:
+Prioritize national and international news, politics, culture, science, business, technology, opinion, and investigative reporting. Always uphold accuracy, fairness, and depth in every story.
+
+INTERACTION:
+Greet with "Welcome to The New York Times." When discussing news, present stories with context and nuance. Offer to go deeper by saying "Would you like a more detailed analysis or related perspectives?"
+"""
+
 mcp = FastMCP("Newspaper Agent", stateless_http=True)
-
-
-@mcp.tool(
-    title="Get Config Instructions",
-    description="Get agent configuration instructions for writing articles",
-)
-def get_config_instructions() -> str:
-    """Get agent configuration instructions"""
-    try:
-        # Handle case where FastMCP might pass Field description as value
-        result = get_agent_instructions(AGENT_CONFIG_ID)
-        
-        if result["status"] == "success":
-            return f"Newspaper: {result['newspaper_name']}\n\nInstructions:\n{result['instructions']}"
-        else:
-            return f"Error: {result['error']}"
-    except Exception as e:
-        return f"Error retrieving config instructions: {str(e)}"
 
 
 @mcp.tool(
@@ -41,22 +42,30 @@ def get_articles_with_config(
 ) -> str:
     """Get articles with config instructions prepended"""
     try:
-        config_result = get_agent_instructions(AGENT_CONFIG_ID)
-        
-        if config_result["status"] != "success":
-            return f"Error getting config: {config_result['error']}"
-        
+
         # Connect to Weaviate and get articles
         client = connect_to_weaviate()
         articles = get_articles(client, query, limit=5)
-        
+
+        media_names = []
+        cats = []
+
+        for art in articles:
+            media_names.append(art.properties["media_name"])
+            cats.append(art.properties["categories"])
+
+        main_cats = set(cat for sublist in cats for cat in sublist)
+
+        system_instructions = f"Newspaper: {media_names}\n\n"
+        system_instructions += f"Categories:\n{main_cats}\n\n"
+        system_instructions += f"Instructions:\n{templates}\n\n"
+
         # Format response
-        response = f"Newspaper: {config_result['newspaper_name']}\n\n"
-        response += f"Instructions:\n{config_result['instructions']}\n\n"
+        response = f"Newspaper: {media_names}\n\n"
         response += "=" * 50 + "\n"
         response += f"ARTICLES (Query: '{query}', Limit: {5})\n"
         response += "=" * 50 + "\n\n"
-        
+
         if not articles:
             response += "No articles found for the given query."
         else:
@@ -65,16 +74,24 @@ def get_articles_with_config(
                 response += f"Title: {article.properties.get('title', 'N/A')}\n"
                 response += f"Content: {article.properties.get('content', 'N/A')}\n"
                 response += f"URL: {article.properties.get('url', 'N/A')}\n"
-                response += f"Published: {article.properties.get('published_date', 'N/A')}\n"
-                if hasattr(article, 'metadata') and article.metadata.distance:
-                    response += f"Relevance Score: {1 - article.metadata.distance:.3f}\n"
+                response += (
+                    f"Published: {article.properties.get('published_date', 'N/A')}\n"
+                )
+                if hasattr(article, "metadata") and article.metadata.distance:
+                    response += (
+                        f"Relevance Score: {1 - article.metadata.distance:.3f}\n"
+                    )
                 response += "\n" + "-" * 40 + "\n\n"
-        
+
         client.close()
-        return response
-        
+        res = {"system": system_instructions, "articles": response}
+
+        return res
+
     except Exception as e:
         return f"Error retrieving articles: {str(e)}"
+    finally:
+        client.close()
 
 
 if __name__ == "__main__":
