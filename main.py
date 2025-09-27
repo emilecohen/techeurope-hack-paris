@@ -18,16 +18,11 @@ mcp = FastMCP("Newspaper Agent", stateless_http=True)
     title="Get Config Instructions",
     description="Get agent configuration instructions for writing articles",
 )
-def get_config_instructions(
-    config_id: Optional[str] = Field(description="Config ID to retrieve (uses default if not provided)", default=None)
-) -> str:
+def get_config_instructions() -> str:
     """Get agent configuration instructions"""
     try:
         # Handle case where FastMCP might pass Field description as value
-        if config_id is None:
-            result = get_agent_instructions()
-        else:
-            result = get_agent_instructions(config_id)
+        result = get_agent_instructions(AGENT_CONFIG_ID)
         
         if result["status"] == "success":
             return f"Newspaper: {result['newspaper_name']}\n\nInstructions:\n{result['instructions']}"
@@ -43,30 +38,23 @@ def get_config_instructions(
 )
 def get_articles_with_config(
     query: str = Field(description="Search query for articles"),
-    limit: int = Field(description="Number of articles to return", default=5),
-    config_id: Optional[str] = Field(description="Config ID to retrieve (uses default if not provided)", default=None)
 ) -> str:
     """Get articles with config instructions prepended"""
     try:
-        # Get config instructions first
-        # Handle case where FastMCP might pass Field description as value
-        if config_id is None or str(config_id).startswith("annotation="):
-            config_result = get_agent_instructions()
-        else:
-            config_result = get_agent_instructions(config_id)
+        config_result = get_agent_instructions(AGENT_CONFIG_ID)
         
         if config_result["status"] != "success":
             return f"Error getting config: {config_result['error']}"
         
         # Connect to Weaviate and get articles
         client = connect_to_weaviate()
-        articles = get_articles(client, query, limit)
+        articles = get_articles(client, query, limit=5)
         
         # Format response
         response = f"Newspaper: {config_result['newspaper_name']}\n\n"
         response += f"Instructions:\n{config_result['instructions']}\n\n"
         response += "=" * 50 + "\n"
-        response += f"ARTICLES (Query: '{query}', Limit: {limit})\n"
+        response += f"ARTICLES (Query: '{query}', Limit: {5})\n"
         response += "=" * 50 + "\n\n"
         
         if not articles:

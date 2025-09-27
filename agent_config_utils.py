@@ -25,7 +25,7 @@ class AgentConfig(BaseModel):
 
 def get_supabase_client() -> Client:
     """Initialize and return Supabase client"""
-    supabase_url = os.getenv("SUPABASE_URL") or os.getenv("DATABASE_URL")
+    supabase_url = os.getenv("DATABASE_URL")
     # Try service role key first for read operations, fallback to anon key
     supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
     
