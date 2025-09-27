@@ -63,7 +63,7 @@ def get_articles_with_config(
         response += f"Instructions:\n{templates}\n\n"
         response += "=" * 50 + "\n"
         response += f"ARTICLES (Query: '{query}', Limit: {5})\n"
-        response += "=" * 50 + "\n\n"
+        response += "=" * 25 + "\n\n"
 
         if not articles:
             response += "No articles found for the given query."
