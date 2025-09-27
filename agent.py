@@ -19,48 +19,43 @@ from fastmcp import Client
 load_dotenv(".env.local")
 
 
-@function_tool()
-async def set_up_times_agent(context: RunContext) -> dict[str]:
-    """Transfer the call to the New York Times Agent, whenever the user mention something can"""
-    client = Client("https://techeurope-hack-pari-6f861422.alpic.live/")
-    async with client:
-        result = await client.call_tool(
-            "get_config_instructions",
-        )
-
-    return (
-        Assistant(
-            instructions=result.content[0].text, greet="Times", agentType="Times"
-        ),
-        "Transferring to The New York Times support",
-    )
-
-
-@function_tool()
-async def revert_to_base_agent(context: RunContext) -> dict[str]:
-    """Revert the agent call to original settings"""
-    return (
-        Assistant(),
-        "Transferring to Base Agent",
-    )
-
-
 class Assistant(Agent):
-    def __init__(
-        self, instructions: str = None, greet: str = None, agentType: str = None
-    ) -> None:
+    def __init__(self, instructions: str = None, greet: str = None) -> None:
         super().__init__(
             instructions=(
                 "You are a helpful voice AI assistant that speaks english."
                 if instructions is None
                 else instructions
-            ),
-            tools=[set_up_times_agent] if agentType is None else [revert_to_base_agent],
+            )
         )
         self.greet = (
-            "Greet the user and ask how you can help them."
-            if greet is None
-            else "Introduce yourself as a The New York Times specialist and ask how you can help with their account always mention what tools you have avalible."
+            "Greet the user and ask how you can help them." if greet is None else greet
+        )
+
+    @function_tool()
+    async def do_a_query(context: RunContext, query: str) -> dict[str]:
+        """
+        Retrieve relevant news articles from the vector database.
+
+        This function accepts a natural language query and searches
+        across stored financial news articles. It returns a dictionary
+        containing the most relevant results, which may include titles,
+        summaries, media sources, categories, and publication details.
+        """
+        client = Client("https://techeurope-hack-pari-6f861422.alpic.live/")
+        async with client:
+            result = await client.call_tool(
+                "get_articles_with_config", {"query": query}
+            )
+
+        system_instructions, articles = result.content[0].text.split("=" * 50)
+
+        return (
+            Assistant(
+                instructions=system_instructions,
+                greet=f"When you start you will summarize the news that i will send you {articles}",
+            ),
+            "Transferring to news agent",
         )
 
     async def on_enter(self) -> None:
@@ -70,7 +65,7 @@ class Assistant(Agent):
 async def entrypoint(ctx: agents.JobContext):
     session = AgentSession(
         llm=openai.realtime.RealtimeModel(voice="coral"),
-        mcp_servers=[mcp.MCPServerHTTP("http://localhost:8000/mcp")],
+        # mcp_servers=[mcp.MCPServerHTTP("http://localhost:8000/mcp")],
     )
 
     await session.start(
