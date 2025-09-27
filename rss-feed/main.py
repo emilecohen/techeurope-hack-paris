@@ -20,7 +20,7 @@ class ArticleDataFrame:
     newspaper_link: str
     rss_link: str
     rss_last_build: str  # ISO 8601 format
-    content: str
+    #content: str
 latest_articles = []
 
 def fetch_rss_feed(rss_url: str) -> List[ArticleDataFrame]:
@@ -54,7 +54,7 @@ def fetch_rss_feed(rss_url: str) -> List[ArticleDataFrame]:
             newspaper_link=newspaper_link,
             rss_link=rss_url,
             rss_last_build=rss_last_build,
-            content=entry.get("content", [{}])[0].get("value", entry.get("summary", "")),
+            #content=entry.get("content", [{}])[0].get("value", entry.get("summary", "")),
         )
 
         if isinstance(article.categories, list):
@@ -69,9 +69,19 @@ def fetch_rss_feed(rss_url: str) -> List[ArticleDataFrame]:
 
 def auto_fetch_rss():
     global latest_articles
-    rss_urls = [
-        "https://www.nasa.gov/rss/dyn/breaking_news.rss",
-        "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    rss_urls = rss_urls = [
+    "http://rss.cnn.com/rss/cnn_topstories.rss",          # CNN - Top Stories
+    "http://feeds.nytimes.com/nyt/rss/HomePage",          # The New York Times - Home
+    "https://feeds.bbci.co.uk/news/world/rss.xml",        # BBC News - World
+    "https://feeds.reuters.com/reuters/topNews",          # Reuters - Top News
+    "http://www.npr.org/rss/rss.php?id=1001",             # NPR News
+    "https://www.aljazeera.com/xml/rss/all.xml",          # Al Jazeera - All News
+    "https://techcrunch.com/feed/",                       # TechCrunch
+    "https://www.theguardian.com/world/rss",              # The Guardian - World
+    "https://www.wired.com/feed/rss",                     # Wired
+    "https://www.bloomberg.com/feed/podcast/bloomberg-surveillance.xml", # Bloomberg
+    "https://www.forbes.com/real-time/feed2",             # Forbes
+    "https://www.ft.com/?format=rss",                     # Financial Times
     ]
 
     while True:
