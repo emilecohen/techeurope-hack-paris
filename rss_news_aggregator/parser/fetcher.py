@@ -1,24 +1,26 @@
-import feedparser
+from dataclasses import asdict
 from datetime import datetime, timezone
 from typing import List
-from dataclasses import asdict
-from models.articles import ArticleDataFrame
-from .cleaner import clean_html, fetch_article_content
-from .saver import save_articles_to_json
 
-# Global variables to hold articles
+import feedparser
+from models.articles import ArticleDataFrame
+
+from .cleaner import clean_html, fetch_article_content
+from .saver import save_articles_to_db
+
 latest_articles: List[dict] = []
 all_fetched_articles: List[dict] = []
-
-# ------------------------
-# Helper Functions
-# ------------------------
 
 def format_datetime(parsed_struct=None) -> str:
     """Convert a struct_time or None to RFC3339 UTC string."""
     if parsed_struct:
-        return datetime(*parsed_struct[:6], tzinfo=timezone.utc).isoformat(timespec='seconds') + "Z"
-    return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat(timespec='seconds') + "Z"
+        # Convert struct_time or tuple to datetime in UTC
+        dt = datetime(*parsed_struct[:6], tzinfo=timezone.utc)
+    else:
+        dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+    
+    # Return RFC3339 format with 'Z' for UTC
+    return dt.isoformat(timespec='seconds').replace('+00:00', 'Z')
 
 def fetch_rss_feed(rss_url: str) -> List[ArticleDataFrame]:
     """
@@ -119,5 +121,5 @@ def auto_fetch_rss(max_articles=50):
             continue
 
     latest_articles = new_articles
-    save_articles_to_json(all_fetched_articles, "data/all_articles.json")
+    save_articles_to_db(all_fetched_articles)
     print(f"Fetched {len(new_articles)} new articles. Total: {len(all_fetched_articles)}")

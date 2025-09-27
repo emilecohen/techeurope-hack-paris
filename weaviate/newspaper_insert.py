@@ -1,6 +1,7 @@
+import os
+
 import weaviate
 from weaviate.classes.init import Auth
-import os
 
 weaviate_url = os.environ["WEAVIATE_URL"]
 weaviate_api_key = os.environ["WEAVIATE_API_KEY"]
