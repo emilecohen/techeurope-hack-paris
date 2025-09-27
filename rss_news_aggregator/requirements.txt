@@ -1,0 +1,6 @@
+Flask
+feedparser
+beautifulsoup4
+requests
+python-dotenv
+weaviate-client
