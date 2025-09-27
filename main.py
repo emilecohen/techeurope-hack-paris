@@ -56,8 +56,9 @@ def get_articles_with_config(
             cats.append(art.properties["categories"])
 
         main_cats = set(cat for sublist in cats for cat in sublist)
+        unique_media_names = set(media_names)
 
-        response = f"Newspaper: {media_names}\n\n"
+        response = f"Newspapers: {unique_media_names}\n\n"
         response += f"Categories:\n{main_cats}\n\n"
         response += f"Instructions:\n{templates}\n\n"
         response += "=" * 50 + "\n"
@@ -90,6 +91,11 @@ def get_articles_with_config(
         return f"Error retrieving articles: {str(e)}"
     finally:
         client.close()
+
+
+@mcp.tool()
+def temp() -> str:
+    return "Bye"
 
 
 if __name__ == "__main__":
