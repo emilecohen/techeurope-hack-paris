@@ -33,13 +33,15 @@ class Assistant(Agent):
     def __init__(self, instructions: str = None, greet: str = None) -> None:
         super().__init__(
             instructions=(
-                "You are a helpful voice AI assistant that speaks english."
+                "You are a helpful voice AI assistant that speaks english and only Engilsh."
                 if instructions is None
                 else instructions
             )
         )
         self.greet = (
-            "Greet the user and ask how you can help them." if greet is None else greet
+            "Greet the user and ask how you can help them that speaks english and only Engilsh.."
+            if greet is None
+            else greet
         )
 
     @function_tool()
