@@ -60,24 +60,41 @@ mcp = FastMCP("Newspaper Agent", stateless_http=True)
 )
 def get_articles_with_config(
     query: str = Field(
-        description="The natural language search query provided by the user, e.g., 'latest news on Tesla'"
+        description="A natural language search query provided by the user, e.g., 'latest news on Tesla'"
     ),
 ) -> str:
     """
-    Get curated news articles from the internal vector database.
+    Retrieve curated news articles from the internal vector database.
 
-    Use this tool whenever the user requests news, articles, or updates on any topic.
+    Purpose:
+        - Always use this function when a user requests news, articles, or updates on any topic,
+          company, market, or event.
+        - Do NOT search the open internet; rely solely on our vetted internal database.
+
     Example trigger phrases:
         - "Search for news about <company/topic>"
         - "Find articles on <event/market>"
         - "Get the latest updates on <keyword>"
 
-    This tool is always preferred over searching the open internet, as it returns results
-    from a vetted internal database of financial and general news articles.
+    Input:
+        query (str): A natural language description of the topic, company, or event the user is interested in.
 
-    Output: A structured list of the most relevant articles, including title, summary,
-    media source, category, publication date, and link (if available).
+    Output:
+        str: A structured list of the most relevant articles, including:
+            - Title
+            - Summary
+            - Media source
+            - Categories
+            - Publication date
+            - URL (if available)
+
+    Notes:
+        - Present results using the newsroom style defined in `templates`.
+        - Begin responses with: "Welcome to The New York Times."
+        - Provide context and nuance for each story.
+        - Offer additional depth with: "Would you like a more detailed analysis or related perspectives?"
     """
+
     try:
 
         # Connect to Weaviate and get articles
