@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Navigation from "@/components/Navigation";
 
 export default function HomePage() {
   const [form, setForm] = useState({
@@ -44,6 +45,7 @@ export default function HomePage() {
 
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
       const data = await response.json();
+      console.log("Server response:", data);
     } catch (error: any) {
       console.error(error);
       alert("Failed to submit form. Some network issue.");
@@ -52,104 +54,133 @@ export default function HomePage() {
     }
   };
 
-  // Computed boolean to check if all required fields are filled
-  const isFormValid = form.companyName.trim() !== "" && form.rssLink.trim() !== "" && form.language.trim() !== "" && form.frequency.trim() !== "";
+  const isFormValid =
+    form.companyName.trim() !== "" &&
+    form.rssLink.trim() !== "" &&
+    form.language.trim() !== "" &&
+    form.frequency.trim() !== "";
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-6">
-      <Card className="w-full max-w-lg shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-center">Newspaper Registration</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Company Name */}
-            <div className="space-y-2">
-              <Label htmlFor="companyName">Company Name</Label>
-              <Input
-                id="companyName"
-                placeholder="e.g. The Daily Times"
-                value={form.companyName}
-                onChange={(e) => handleChange("companyName", e.target.value)}
-              />
-            </div>
+    <div className="min-h-screen bg-background">
+      {/* NAVIGATION BAR */}
+      <Navigation />
 
-            {/* RSS Link */}
-            <div className="space-y-2">
-              <Label htmlFor="rssLink">RSS Feed Link</Label>
-              <Input id="rssLink" placeholder="https://example.com/rss" value={form.rssLink} onChange={(e) => handleChange("rssLink", e.target.value)} />
-            </div>
-
-            {/* Categories */}
-            <div className="space-y-2">
-              <Label htmlFor="categories">Categories</Label>
-              <Textarea
-                id="categories"
-                placeholder="Politics, Sports, Technology"
-                value={form.categories}
-                onChange={(e) => handleChange("categories", e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground">Separate multiple categories with commas.</p>
-            </div>
-
-            {/* Language + Max Retrieval Articles + Frequency */}
-            <div className="flex justify-between">
-              {/* Language */}
+      {/* MAIN CONTENT */}
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-6">
+        <Card className="w-full max-w-lg shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-center">
+              Newspaper Registration
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {/* Company Name */}
               <div className="space-y-2">
-                <Label htmlFor="language">Language</Label>
-                <Select value={form.language} onValueChange={(val) => handleChange("language", val)}>
-                  <SelectTrigger id="language" className="data-[state=open]:origin-bottom-top">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent side="top">
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
-                    <SelectItem value="it">Italian</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Max Retrieval Articles */}
-              <div className="w-24 space-y-2">
-                <Label htmlFor="maxArticles">Max Articles</Label>
+                <Label htmlFor="companyName">Company Name</Label>
                 <Input
-                  id="maxArticles"
-                  type="number"
-                  min={1}
-                  max={200}
-                  value={form.maxArticles}
-                  onChange={(e) => handleChange("maxArticles", Number(e.target.value))}
+                  id="companyName"
+                  placeholder="e.g. The Daily Times"
+                  value={form.companyName}
+                  onChange={(e) => handleChange("companyName", e.target.value)}
                 />
               </div>
 
-              {/* Frequency */}
+              {/* RSS Link */}
               <div className="space-y-2">
-                <Label htmlFor="frequency">Frequency</Label>
-                <Select value={form.frequency} onValueChange={(val) => handleChange("frequency", val)}>
-                  <SelectTrigger id="frequency">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="15m">Every 15 minutes</SelectItem>
-                    <SelectItem value="30m">Every 30 minutes</SelectItem>
-                    <SelectItem value="1h">Every hour</SelectItem>
-                    <SelectItem value="6h">Every 6 hours</SelectItem>
-                    <SelectItem value="12h">Every 12 hours</SelectItem>
-                    <SelectItem value="24h">Daily</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="rssLink">RSS Feed Link</Label>
+                <Input
+                  id="rssLink"
+                  placeholder="https://example.com/rss"
+                  value={form.rssLink}
+                  onChange={(e) => handleChange("rssLink", e.target.value)}
+                />
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <Button type="submit" className="w-full cursor-pointer" disabled={loading || !isFormValid}>
-              {loading ? "Submitting..." : "Submit"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+              {/* Categories */}
+              <div className="space-y-2">
+                <Label htmlFor="categories">Categories</Label>
+                <Textarea
+                  id="categories"
+                  placeholder="Politics, Sports, Technology"
+                  value={form.categories}
+                  onChange={(e) => handleChange("categories", e.target.value)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Separate multiple categories with commas.
+                </p>
+              </div>
+
+              {/* Language + Max Articles + Frequency */}
+              <div className="flex justify-between gap-4">
+                {/* Language */}
+                <div className="space-y-2 w-1/3">
+                  <Label htmlFor="language">Language</Label>
+                  <Select
+                    value={form.language}
+                    onValueChange={(val) => handleChange("language", val)}
+                  >
+                    <SelectTrigger id="language" className="data-[state=open]:origin-bottom-top">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent side="top">
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="es">Spanish</SelectItem>
+                      <SelectItem value="fr">French</SelectItem>
+                      <SelectItem value="de">German</SelectItem>
+                      <SelectItem value="it">Italian</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Max Retrieval Articles */}
+                <div className="w-24 space-y-2">
+                  <Label htmlFor="maxArticles">Max Articles</Label>
+                  <Input
+                    id="maxArticles"
+                    type="number"
+                    min={1}
+                    max={200}
+                    value={form.maxArticles}
+                    onChange={(e) => handleChange("maxArticles", Number(e.target.value))}
+                  />
+                </div>
+
+                {/* Frequency */}
+                <div className="space-y-2 w-1/3">
+                  <Label htmlFor="frequency">Frequency</Label>
+                  <Select
+                    value={form.frequency}
+                    onValueChange={(val) => handleChange("frequency", val)}
+                  >
+                    <SelectTrigger id="frequency">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15m">Every 15 minutes</SelectItem>
+                      <SelectItem value="30m">Every 30 minutes</SelectItem>
+                      <SelectItem value="1h">Every hour</SelectItem>
+                      <SelectItem value="6h">Every 6 hours</SelectItem>
+                      <SelectItem value="12h">Every 12 hours</SelectItem>
+                      <SelectItem value="24h">Daily</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={loading || !isFormValid}
+              >
+                {loading ? "Submitting..." : "Submit"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
   );
 }
+
