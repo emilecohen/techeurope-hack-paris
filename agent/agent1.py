@@ -30,18 +30,23 @@ load_dotenv(".env.local")
 
 
 class Assistant(Agent):
-    def __init__(self, instructions: str = None, greet: str = None) -> None:
+    def __init__(
+        self, instructions: str | None = None, greet: str | None = None
+    ) -> None:
         super().__init__(
             instructions=(
-                "You are a helpful voice AI assistant that speaks english and only Engilsh."
-                if instructions is None
-                else instructions
+                instructions
+                if instructions is not None
+                else (
+                    "You are a helpful voice AI assistant. "
+                    "You must always speak clearly in English, and only in English."
+                )
             )
         )
         self.greet = (
-            "Greet the user and ask how you can help them that speaks english and only Engilsh.."
-            if greet is None
-            else greet
+            greet
+            if greet is not None
+            else "Hello! How can I help you today? (Please note: I only speak English.)"
         )
 
     @function_tool()
