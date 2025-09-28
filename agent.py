@@ -23,7 +23,13 @@ class Assistant(Agent):
     def __init__(self, instructions: str = None, greet: str = None) -> None:
         super().__init__(
             instructions=(
-                "You are a helpful voice AI assistant that speaks english."
+                "You are a helpful voice AI assistant that speaks English clearly and naturally. "
+                "Your role is to assist users by answering questions, holding natural conversations, "
+                "and retrieving information when requested. "
+                "If the user asks to search for or look up news, financial updates, or articles "
+                "on a specific topic, company, or event, you should call the 'get_articles_with_config' function. "
+                "Always provide concise, accurate, and polite responses, and when relevant, summarize "
+                "the retrieved results in plain English."
                 if instructions is None
                 else instructions
             )
@@ -37,10 +43,18 @@ class Assistant(Agent):
         """
         Retrieve relevant news articles from the vector database.
 
-        This function accepts a natural language query and searches
-        across stored financial news articles. It returns a dictionary
-        containing the most relevant results, which may include titles,
-        summaries, media sources, categories, and publication details.
+        Use this function whenever the user asks to look up or search for news,
+        financial updates, or information on a specific topic, company, or event.
+        Typical trigger phrases include (but are not limited to):
+            - "Search for news about <topic>"
+            - "Find articles on <company/event>"
+            - "Get the latest updates on <subject>"
+            - "Look up financial news regarding <keyword>"
+
+        This function accepts a natural language query and searches across stored
+        financial news articles. It returns a dictionary containing the most relevant
+        results, which may include titles, summaries, media sources, categories, and
+        publication details.
         """
         client = Client("https://techeurope-hack-pari-6f861422.alpic.live/")
         async with client:
