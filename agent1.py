@@ -76,7 +76,7 @@ async def entrypoint(ctx: JobContext, avatar_id: Optional[str]) -> None:
     await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
     session = AgentSession(
         llm=openai.realtime.RealtimeModel(
-            voice="alloy",
+            voice="coral",
             model="gpt-realtime",
             turn_detection=TurnDetection(
                 type="server_vad",
@@ -116,7 +116,9 @@ if __name__ == "__main__":
     sys.argv = [sys.argv[0], "dev"]  # overwrite args for the LiveKit CLI
     cli.run_app(
         WorkerOptions(
-            entrypoint_fnc=partial(entrypoint, avatar_id=args.avatar_id),
+            entrypoint_fnc=partial(
+                entrypoint, avatar_id="b5bebaf9-ae80-4e43-b97f-4506136ed926"
+            ),
             worker_type=WorkerType.ROOM,
         )
     )
