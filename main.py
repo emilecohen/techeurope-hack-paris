@@ -8,7 +8,7 @@ from typing import Optional
 
 import mcp.types as types
 
-from weaviate_utils import connect_to_weaviate, get_articles
+from weaviate_utils import connect_to_weaviate, get_articles, delete_articles
 
 templates = """Truth. It’s more important now than ever.
 Established 1851.
@@ -29,7 +29,22 @@ Prioritize national and international news, politics, culture, science, business
 
 INTERACTION:
 Greet with "Welcome to The New York Times." When discussing news, present stories with context and nuance. Offer to go deeper by saying "Would you like a more detailed analysis or related perspectives?"
+
+COMMANDS:
+1. Get Articles:
+   - Purpose: Retrieve articles from our vector database.
+   - Input: Search query (topic, keyword, or phrase).
+   - Output: A list of relevant articles with title, media source, categories, content snippet, URL, and publication date.
+   - Style: Always introduce the response with our newsroom identity, list results clearly, and offer to go deeper if the reader wants more.
+
+2. Delete Articles:
+   - Purpose: Permanently erase all articles belonging to a specific media source from our vector database.
+   - Input: Media name (exact outlet name).
+   - Output: A confirmation message that the records have been deleted with integrity.
+   - Style: Keep the tone professional and clear, acknowledging the deletion as a matter of record.
+
 """
+
 
 mcp = FastMCP("Newspaper Agent", stateless_http=True)
 
@@ -93,9 +108,33 @@ def get_articles_with_config(
         client.close()
 
 
-@mcp.tool()
-def temp() -> str:
-    return "Bye"
+@mcp.tool(
+    title="Delete Articles",
+    description="Delete all articles from a specific media source in Weaviate",
+)
+def delete_articles_by_media(
+    media_name: str = Field(
+        description="The exact name of the media source to delete articles from"
+    ),
+) -> str:
+    """
+    Permanently remove all articles belonging to the given media source from Weaviate.
+    Use this tool with caution, as it will delete every stored article for that media outlet.
+    """
+    try:
+        client = connect_to_weaviate()
+        response = delete_articles(client, media_name)
+
+        return (
+            f"All articles from media source '{media_name}' have been successfully deleted.\n"
+            f"Action completed with integrity: the database no longer contains these records."
+        )
+
+    except Exception as e:
+        return f"Error deleting articles for '{media_name}': {str(e)}"
+
+    finally:
+        client.close()
 
 
 if __name__ == "__main__":
