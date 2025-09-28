@@ -1,18 +1,22 @@
 import weaviate
 from weaviate.classes.init import Auth
 from weaviate.classes.config import Configure, Property, DataType, VectorDistances, VectorFilterStrategy, Tokenization
+from dotenv import load_dotenv
 import os
 
+# Load the .env file
+load_dotenv()
+
 # ----- Client & auth -----
-weaviate_url = os.environ["WEAVIATE_URL"]
-weaviate_api_key = os.environ["WEAVIATE_API_KEY"]
-cohere_api_key = os.environ["COHERE_APIKEY"]
+weaviate_url = os.getenv("WEAVIATE_URL")
+weaviate_key = os.getenv("WEAVIATE_API_KEY")
+cohere_api_key = os.getenv("COHERE_API_KEY")
 
 try:
     client = weaviate.connect_to_weaviate_cloud(
         cluster_url=weaviate_url,
-        auth_credentials=Auth.api_key(weaviate_api_key),
-        headers={"X-Cohere-Api-Key": cohere_api_key},
+        auth_credentials=Auth.api_key(weaviate_key),
+        headers={"X-OpenAI-Api-Key": cohere_api_key},
     )
 
     client.collections.create(
@@ -25,8 +29,7 @@ try:
                 filter_strategy=VectorFilterStrategy.SWEEPING
             )
         ),
-        reranker_config=Configure.Reranker.cohere(),
-        generative_config=Configure.Generative.cohere(),
+        generative_config=Configure.Generative.openai(),
         properties=[
             Property(name="media_name", description="Name of the media company (i.e. 'The Washington Post')", index_filterable=True, index_searchable=True, data_type=DataType.TEXT, skip_vectorization=True),
             Property(name="title", description="Title of the article", data_type=DataType.TEXT, skip_vectorization=True),

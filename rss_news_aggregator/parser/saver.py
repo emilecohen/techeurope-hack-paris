@@ -1,6 +1,4 @@
-import json
 import os
-from types import SimpleNamespace
 from typing import List
 
 from dotenv import load_dotenv
@@ -13,15 +11,14 @@ load_dotenv()
 
 # Access environment variables
 weaviate_url = os.getenv("WEAVIATE_URL")
-weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
-cohere_api_key = os.getenv("COHERE_API_KEY")
+weaviate_key = os.getenv("WEAVIATE_API_KEY")
+cohere_api_key = "xvEkILV7R3IPasBOxYyU3WnrpQMbGC8mTdn5SyHy"
 
 def save_articles_to_db(articles: List[dict]):
-    print("something here")
     try:
         client = weaviate.connect_to_weaviate_cloud(
             cluster_url=weaviate_url,
-            auth_credentials=Auth.api_key(weaviate_api_key),
+            auth_credentials=Auth.api_key(weaviate_key),
             headers={"X-Cohere-Api-Key": cohere_api_key},
         )
 
@@ -56,13 +53,3 @@ def save_articles_to_db(articles: List[dict]):
     
     finally:
         client.close()
-
-"""
-def save_articles_to_json(articles: List[dict], filename="data/all_articles.json"):
-    try:
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(articles, f, indent=4, ensure_ascii=False)
-        print(f"Saved {len(articles)} articles to {filename}")
-    except Exception as e:
-        print(f"Failed to save articles to JSON: {e}")
-"""

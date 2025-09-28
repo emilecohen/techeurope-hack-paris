@@ -34,7 +34,8 @@ def fetch_rss_feed(company_name: str, language: str, rss_url: str) -> List[Artic
 
     articles = []
     rss_last_build = format_datetime(feed.feed.get("updated_parsed"))
-    media_name = feed.feed.get("title", "Unknown Source")
+    media_name = company_name
+    language = language
 
     for entry in feed.entries:
         try:
@@ -58,7 +59,7 @@ def fetch_rss_feed(company_name: str, language: str, rss_url: str) -> List[Artic
                 description=description,
                 author=clean_html(entry.get("author", "Unknown")),
                 date=pub_date,
-                language=feed.feed.get("language", "unknown"),
+                language=language,
                 categories=categories,
                 newspaper_link=newspaper_link,
                 rss_link=rss_url,
@@ -85,6 +86,8 @@ def auto_fetch_rss(company_name: str, language: str, max_articles: int, rss_link
     global latest_articles, all_fetched_articles
 
     new_articles = []
+
+    print(rss_link)
 
     if len(all_fetched_articles) >= max_articles:
         return
