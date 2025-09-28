@@ -2,9 +2,9 @@ import argparse
 import sys
 from functools import partial
 from typing import Optional
-
 from dotenv import load_dotenv
 
+from livekit import agents
 from livekit.agents import (
     AutoSubscribe,
     JobContext,
@@ -22,41 +22,59 @@ from livekit.plugins import (
     openai,
     noise_cancellation,
 )
-
+from fastmcp import Client
 from openai.types.beta.realtime.session import TurnDetection
-from livekit.agents import mcp
+
 
 load_dotenv(".env.local")
 
 
 class Assistant(Agent):
-    def __init__(self) -> None:
-        super().__init__(instructions="You are a helpful voice AI assistant.")
-
-    async def on_enter(self) -> None:
-        await self.session.generate_reply(
-            instructions="Greet the user and ask how you can help them."
+    def __init__(self, instructions: str = None, greet: str = None) -> None:
+        super().__init__(
+            instructions=(
+                "You are a helpful voice AI assistant that speaks english."
+                if instructions is None
+                else instructions
+            )
+        )
+        self.greet = (
+            "Greet the user and ask how you can help them." if greet is None else greet
         )
 
     @function_tool()
-    async def lookup_weather(
-        self,
-        context: RunContext,
-        location: str,
-    ) -> dict[str]:
-        """Look up weather information for a given location.
-
-        Args:
-            location: The location to look up weather information for.
+    async def do_a_query(context: RunContext, query: str) -> dict[str]:
         """
+        Retrieve relevant news articles from the vector database.
 
-        return {"weather": "sunny", "temperature_f": 70}
+        This function accepts a natural language query and searches
+        across stored financial news articles. It returns a dictionary
+        containing the most relevant results, which may include titles,
+        summaries, media sources, categories, and publication details.
+        """
+        client = Client("https://techeurope-hack-pari-6f861422.alpic.live/")
+        async with client:
+            result = await client.call_tool(
+                "get_articles_with_config", {"query": query}
+            )
+
+        system_instructions, articles = result.content[0].text.split("=" * 50)
+
+        return (
+            Assistant(
+                instructions=system_instructions,
+                greet=f"When you start you will summarize the news that i will send you {articles}",
+            ),
+            "Transferring to news agent",
+        )
+
+    async def on_enter(self) -> None:
+        await self.session.generate_reply(instructions=self.greet)
 
 
 async def entrypoint(ctx: JobContext, avatar_id: Optional[str]) -> None:
     await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
-
-    local_agent_session = AgentSession(
+    session = AgentSession(
         llm=openai.realtime.RealtimeModel(
             voice="alloy",
             model="gpt-realtime",
@@ -76,9 +94,9 @@ async def entrypoint(ctx: JobContext, avatar_id: Optional[str]) -> None:
         bey_avatar_session = bey.AvatarSession(avatar_id=avatar_id)
     else:
         bey_avatar_session = bey.AvatarSession()
-    await bey_avatar_session.start(local_agent_session, room=ctx.room)
+    await bey_avatar_session.start(session, room=ctx.room)
 
-    await local_agent_session.start(
+    await session.start(
         agent=Assistant(),
         room=ctx.room,
         room_input_options=RoomInputOptions(
