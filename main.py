@@ -129,33 +129,33 @@ def get_articles_with_config(
         client.close()
 
 
-@mcp.tool(
-    title="Delete Articles",
-    description="Delete all articles from a specific media source in Weaviate",
-)
-def delete_articles_by_media(
-    media_name: str = Field(
-        description="The exact name of the media source to delete articles from"
-    ),
-) -> str:
-    """
-    Permanently remove all articles belonging to the given media source from Weaviate.
-    Use this tool with caution, as it will delete every stored article for that media outlet.
-    """
-    try:
-        client = connect_to_weaviate()
-        response = delete_articles(client, media_name)
+# @mcp.tool(
+#     title="Delete Articles",
+#     description="Delete all articles from a specific media source in Weaviate",
+# )
+# def delete_articles_by_media(
+#     media_name: str = Field(
+#         description="The exact name of the media source to delete articles from"
+#     ),
+# ) -> str:
+#     """
+#     Permanently remove all articles belonging to the given media source from Weaviate.
+#     Use this tool with caution, as it will delete every stored article for that media outlet.
+#     """
+#     try:
+#         client = connect_to_weaviate()
+#         response = delete_articles(client, media_name)
 
-        return (
-            f"All articles from media source '{media_name}' have been successfully deleted.\n"
-            f"Action completed with integrity: the database no longer contains these records."
-        )
+#         return (
+#             f"All articles from media source '{media_name}' have been successfully deleted.\n"
+#             f"Action completed with integrity: the database no longer contains these records."
+#         )
 
-    except Exception as e:
-        return f"Error deleting articles for '{media_name}': {str(e)}"
+#     except Exception as e:
+#         return f"Error deleting articles for '{media_name}': {str(e)}"
 
-    finally:
-        client.close()
+#     finally:
+#         client.close()
 
 
 if __name__ == "__main__":
