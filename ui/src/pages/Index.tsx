@@ -32,9 +32,11 @@ export default function HomePage() {
       maxArticles: Math.min(Number(form.maxArticles), 200),
     };
 
+    console.log(safeForm);
+
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/newspaper", {
+      const response = await fetch("http://127.0.0.1:8080/posting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(safeForm),
@@ -42,8 +44,6 @@ export default function HomePage() {
 
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
       const data = await response.json();
-      console.log("Backend response:", data);
-      alert("Form submitted successfully!");
     } catch (error: any) {
       console.error(error);
       alert("Failed to submit form. Some network issue.");

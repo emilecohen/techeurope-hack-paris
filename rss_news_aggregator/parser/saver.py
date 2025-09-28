@@ -16,10 +16,8 @@ weaviate_url = os.getenv("WEAVIATE_URL")
 weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
 cohere_api_key = os.getenv("COHERE_API_KEY")
 
-print(weaviate_url)
-print(weaviate_api_key)
-
 def save_articles_to_db(articles: List[dict]):
+    print("something here")
     try:
         client = weaviate.connect_to_weaviate_cloud(
             cluster_url=weaviate_url,

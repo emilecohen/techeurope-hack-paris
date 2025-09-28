@@ -22,7 +22,7 @@ def format_datetime(parsed_struct=None) -> str:
     # Return RFC3339 format with 'Z' for UTC
     return dt.isoformat(timespec='seconds').replace('+00:00', 'Z')
 
-def fetch_rss_feed(rss_url: str) -> List[ArticleDataFrame]:
+def fetch_rss_feed(company_name: str, language: str, rss_url: str) -> List[ArticleDataFrame]:
     """
     Fetches and parses a single RSS feed URL and returns a list of ArticleDataFrame objects.
     """
@@ -78,48 +78,35 @@ def fetch_rss_feed(rss_url: str) -> List[ArticleDataFrame]:
 # Auto-fetch Function
 # ------------------------
 
-def auto_fetch_rss(max_articles=50):
+def auto_fetch_rss(company_name: str, language: str, max_articles: int, rss_link: str):
     """
-    Fetch RSS feeds until max_articles are collected, avoiding duplicates.
+    Fetch RSS feed from a single RSS link until max_articles are collected, avoiding duplicates.
     """
     global latest_articles, all_fetched_articles
 
-    rss_urls = [
-        "https://feeds.bbci.co.uk/news/world/rss.xml",
-        "https://www.aljazeera.com/xml/rss/all.xml",
-        "https://www.theguardian.com/world/rss",
-        "https://feeds.reuters.com/Reuters/worldNews",
-        "https://www.cfr.org/rss/news-releases.xml",
-        "https://worldview.stratfor.com/feed",
-        "https://www.defenseone.com/feeds/all/",
-        "https://carnegieendowment.org/rss/news"
-    ]
-
     new_articles = []
 
-    for rss_url in rss_urls:
-        if len(all_fetched_articles) >= max_articles:
-            break
-        try:
-            articles = fetch_rss_feed(rss_url)
-            for article in articles:
-                dict_article = asdict(article)
-                # Avoid duplicates by newspaper link
-                if dict_article['newspaper_link'] in [a['newspaper_link'] for a in all_fetched_articles]:
-                    continue
+    if len(all_fetched_articles) >= max_articles:
+        return
 
-                new_articles.append(dict_article)
-                all_fetched_articles.append(dict_article)
+    try:
+        articles = fetch_rss_feed(company_name, language, rss_link)
+        for article in articles:
+            dict_article = asdict(article)
+            # Avoid duplicates by newspaper link
+            if dict_article['newspaper_link'] in [a['newspaper_link'] for a in all_fetched_articles]:
+                continue
 
-                if len(all_fetched_articles) >= max_articles:
-                    print("✅ Max articles reached!")
-                    break
+            new_articles.append(dict_article)
+            all_fetched_articles.append(dict_article)
+
             if len(all_fetched_articles) >= max_articles:
                 break
-        except Exception as e:
-            print(f"Error fetching from {rss_url}: {e}")
-            continue
+
+    except Exception as e:
+        print(f"Error fetching from {rss_link}: {e}")
 
     latest_articles = new_articles
     save_articles_to_db(all_fetched_articles)
     print(f"Fetched {len(new_articles)} new articles. Total: {len(all_fetched_articles)}")
+
