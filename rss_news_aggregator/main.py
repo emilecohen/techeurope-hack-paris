@@ -15,7 +15,7 @@ app = FastAPI()
 # Allow any origin for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080"],  # frontend URLs
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +32,4 @@ async def upload_articles(request: ArticleRequest):
         request.rssLink
     )
 
-    # Mock response for example
-    fetched_articles = ["article1", "article2"]
-
-    return {"status": "success", "fetched": len(fetched_articles)}
+    return {"status": "success"}

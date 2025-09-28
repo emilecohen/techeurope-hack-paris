@@ -15,7 +15,7 @@ export default function HomePage() {
     rssLink: "",
     categories: "",
     language: "",
-    maxArticles: 50,
+    maxArticles: 200,
     frequency: "",
   });
 
@@ -37,7 +37,7 @@ export default function HomePage() {
 
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:8080/posting", {
+      const response = await fetch("http://127.0.0.1:8000/posting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(safeForm),
@@ -54,22 +54,12 @@ export default function HomePage() {
     }
   };
 
-  const isFormValid =
-    form.companyName.trim() !== "" &&
-    form.rssLink.trim() !== "" &&
-    form.language.trim() !== "" &&
-    form.frequency.trim() !== "";
+  const isFormValid = form.companyName.trim() !== "" && form.rssLink.trim() !== "" && form.language.trim() !== "" && form.frequency.trim() !== "";
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       {/* Video de fondo */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute top-0 left-0 w-full h-full object-contain mx-auto my-auto z-0 bg-black"
-      >
+      <video autoPlay muted loop playsInline className="absolute top-0 left-0 w-full h-full object-contain mx-auto my-auto z-0 bg-black">
         <source src="/background.mp4" type="video/mp4" />
         Tu navegador no soporta video en HTML5.
       </video>
@@ -82,9 +72,7 @@ export default function HomePage() {
         <main className="min-h-screen flex items-center justify-center p-6">
           <Card className="w-full max-w-lg shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold text-center">
-                Newspaper Registration
-              </CardTitle>
+              <CardTitle className="text-xl font-semibold text-center">Newspaper Registration</CardTitle>
             </CardHeader>
             <CardContent>
               <form className="space-y-6" onSubmit={handleSubmit}>
@@ -102,12 +90,7 @@ export default function HomePage() {
                 {/* RSS Link */}
                 <div className="space-y-2">
                   <Label htmlFor="rssLink">RSS Feed Link</Label>
-                  <Input
-                    id="rssLink"
-                    placeholder="https://example.com/rss"
-                    value={form.rssLink}
-                    onChange={(e) => handleChange("rssLink", e.target.value)}
-                  />
+                  <Input id="rssLink" placeholder="https://example.com/rss" value={form.rssLink} onChange={(e) => handleChange("rssLink", e.target.value)} />
                 </div>
 
                 {/* Categories */}
@@ -119,9 +102,7 @@ export default function HomePage() {
                     value={form.categories}
                     onChange={(e) => handleChange("categories", e.target.value)}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Separate multiple categories with commas.
-                  </p>
+                  <p className="text-sm text-muted-foreground">Separate multiple categories with commas.</p>
                 </div>
 
                 {/* Language + Max Articles + Frequency */}
@@ -129,10 +110,7 @@ export default function HomePage() {
                   {/* Language */}
                   <div className="space-y-2 w-1/3">
                     <Label htmlFor="language">Language</Label>
-                    <Select
-                      value={form.language}
-                      onValueChange={(val) => handleChange("language", val)}
-                    >
+                    <Select value={form.language} onValueChange={(val) => handleChange("language", val)}>
                       <SelectTrigger id="language">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -162,10 +140,7 @@ export default function HomePage() {
                   {/* Frequency */}
                   <div className="space-y-2 w-1/3">
                     <Label htmlFor="frequency">Frequency</Label>
-                    <Select
-                      value={form.frequency}
-                      onValueChange={(val) => handleChange("frequency", val)}
-                    >
+                    <Select value={form.frequency} onValueChange={(val) => handleChange("frequency", val)}>
                       <SelectTrigger id="frequency">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -182,11 +157,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="w-full cursor-pointer"
-                  disabled={loading || !isFormValid}
-                >
+                <Button type="submit" className="w-full cursor-pointer" disabled={loading || !isFormValid}>
                   {loading ? "Submitting..." : "Submit"}
                 </Button>
               </form>
