@@ -83,7 +83,7 @@ class Assistant(Agent):
                 "get_articles_with_config", {"query": query}
             )
 
-        return result
+        return result.content[0].text
 
     async def on_enter(self) -> None:
         await self.session.generate_reply(instructions=self.greet)
