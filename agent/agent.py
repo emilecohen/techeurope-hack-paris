@@ -37,10 +37,18 @@ class Assistant(Agent):
         """
         Retrieve relevant news articles from the vector database.
 
-        This function accepts a natural language query and searches
-        across stored financial news articles. It returns a dictionary
-        containing the most relevant results, which may include titles,
-        summaries, media sources, categories, and publication details.
+        Use this function whenever the user asks to look up or search for news,
+        financial updates, or information on a specific topic, company, or event.
+        Typical trigger phrases include (but are not limited to):
+            - "Search for news about <topic>"
+            - "Find articles on <company/event>"
+            - "Get the latest updates on <subject>"
+            - "Look up financial news regarding <keyword>"
+
+        This function accepts a natural language query and searches across stored
+        financial news articles. It returns a dictionary containing the most relevant
+        results, which may include titles, summaries, media sources, categories, and
+        publication details.
         """
         client = Client("https://techeurope-hack-pari-6f861422.alpic.live/")
         async with client:
