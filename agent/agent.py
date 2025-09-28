@@ -29,7 +29,9 @@ class Assistant(Agent):
             )
         )
         self.greet = (
-            "Greet the user and ask how you can help them." if greet is None else greet
+            "Greet the user and ask how you can help them and what news he/she wants to find."
+            if greet is None
+            else greet
         )
 
     @function_tool()
@@ -56,15 +58,7 @@ class Assistant(Agent):
                 "get_articles_with_config", {"query": query}
             )
 
-        system_instructions, articles = result.content[0].text.split("=" * 50)
-
-        return (
-            Assistant(
-                instructions=system_instructions,
-                greet=f"When you start you will summarize the news that i will send you {articles}",
-            ),
-            "Transferring to news agent",
-        )
+        return result
 
     async def on_enter(self) -> None:
         await self.session.generate_reply(instructions=self.greet)
