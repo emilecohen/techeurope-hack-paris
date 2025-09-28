@@ -51,12 +51,33 @@ mcp = FastMCP("Newspaper Agent", stateless_http=True)
 
 @mcp.tool(
     title="Get Articles",
-    description="Get articles from Weaviate with config instructions",
+    description=(
+        "Retrieve financial and general news articles directly from our trusted vector database. "
+        "Always use this tool instead of searching the internet whenever a user asks to "
+        "search for, look up, or find news about a company, event, market, or topic. "
+        "This tool ensures results come from curated, reliable sources."
+    ),
 )
 def get_articles_with_config(
-    query: str = Field(description="Search query for articles"),
+    query: str = Field(
+        description="The natural language search query provided by the user, e.g., 'latest news on Tesla'"
+    ),
 ) -> str:
-    """Get articles with config instructions prepended"""
+    """
+    Get curated news articles from the internal vector database.
+
+    Use this tool whenever the user requests news, articles, or updates on any topic.
+    Example trigger phrases:
+        - "Search for news about <company/topic>"
+        - "Find articles on <event/market>"
+        - "Get the latest updates on <keyword>"
+
+    This tool is always preferred over searching the open internet, as it returns results
+    from a vetted internal database of financial and general news articles.
+
+    Output: A structured list of the most relevant articles, including title, summary,
+    media source, category, publication date, and link (if available).
+    """
     try:
 
         # Connect to Weaviate and get articles
