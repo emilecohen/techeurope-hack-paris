@@ -37,20 +37,30 @@ class Assistant(Agent):
     @function_tool()
     async def do_a_query(context: RunContext, query: str) -> dict[str]:
         """
-        Retrieve relevant news articles from the vector database.
+        Retrieve relevant news articles from the vector database using the 'get_articles_with_config' tool.
 
-        Use this function whenever the user asks to look up or search for news,
-        financial updates, or information on a specific topic, company, or event.
-        Typical trigger phrases include (but are not limited to):
+        Purpose:
+            - Always use this function whenever the user asks to look up or search for news,
+              financial updates, or information on a specific topic, company, or event.
+            - Do NOT search the open internet; rely only on our curated, reliable sources.
+
+        Trigger phrases include (but are not limited to):
             - "Search for news about <topic>"
             - "Find articles on <company/event>"
             - "Get the latest updates on <subject>"
             - "Look up financial news regarding <keyword>"
 
-        This function accepts a natural language query and searches across stored
-        financial news articles. It returns a dictionary containing the most relevant
-        results, which may include titles, summaries, media sources, categories, and
-        publication details.
+        Input:
+            query (str): A natural language query describing the topic, company, or event.
+
+        Output:
+            dict[str]: The most relevant results retrieved from the vector database,
+            which may include titles, summaries, media sources, categories, and publication details.
+
+        Notes:
+            - Ensure the response adheres to the newsroom style and voice defined in templates.
+            - Begin responses with "Welcome to The New York Times" and provide context and nuance.
+            - Offer to go deeper: "Would you like a more detailed analysis or related perspectives?"
         """
         client = Client("https://techeurope-hack-pari-6f861422.alpic.live/")
         async with client:
@@ -58,7 +68,7 @@ class Assistant(Agent):
                 "get_articles_with_config", {"query": query}
             )
 
-        return result
+        return result.content[0].text
 
     async def on_enter(self) -> None:
         await self.session.generate_reply(instructions=self.greet)
